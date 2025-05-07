@@ -21,13 +21,15 @@ import { NormalAnimationBlendMode } from "./constants"
 import { aniTime, aniValues } from "./data"
 import { FaceLandmarker, FilesetResolver } from "@mediapipe/tasks-vision"
 import { LoopSubdivision } from "./subdivide/LoopSubdivision"
+// import { MeshPhysicalMaterial } from "./materials/MeshPhysicalMaterial"
+// import { MeshStandardMaterial } from "./materials/MeshStandardMaterial"
 
 const loadingManager = new LoadingManager()
 loadingManager.onProgress = (url, loaded, total) => {
 	console.log(`Loading file: ${url}.\nLoaded ${loaded} of ${total} files.`)
 }
 
-const MODEL_PATH = new URL("/FemaleBaseMesh.glb", import.meta.url).href
+const MODEL_PATH = new URL("/SubdivideMesh.glb", import.meta.url).href
 
 class App {
 	canvas
@@ -248,8 +250,8 @@ class App {
 	}
 
 	async loadModel() {
-		const aniClipKF = new NumberKeyframeTrack("mesh_2.morphTargetInfluences", aniTime, aniValues)
-		const aniClip = new AnimationClip("Any", 11.18083381652832, [aniClipKF], NormalAnimationBlendMode)
+		// const aniClipKF = new NumberKeyframeTrack("mesh_2.morphTargetInfluences", aniTime, aniValues)
+		// const aniClip = new AnimationClip("Any", 11.18083381652832, [aniClipKF], NormalAnimationBlendMode)
 		// ~~~~~~~~~~~~~~~
 
 		const loader = new GLTFLoader(loadingManager)
@@ -268,21 +270,25 @@ class App {
 			console.log("gltf.scene", gltf.scene)
 			console.log("gltf.scene.children", gltf.scene.children[0])
 
-			this.mixer = new AnimationMixer(mesh)
-			const facialAnimation = gltf.animations[0]
+			// this.mixer = new AnimationMixer(mesh)
+			// const facialAnimation = gltf.animations[0]
 			// console.log("facialAnimation", facialAnimation)
 			// console.log("aniClip", aniClip)
 
-			const animationAction = this.mixer.clipAction(aniClip)
-			console.log("animationAction", animationAction)
-			animationAction.play()
+			// const animationAction = this.mixer.clipAction(aniClip)
+			// console.log("animationAction", animationAction)
+			// animationAction.play()
 
 			// const geometry = LoopSubdivision.modify(mesh.geometry, 2)
 			// const material = mesh.material.clone()
 			// material.flatShading = false
-			// const mesh_subdivided = new Mesh(geometry, material)
+			// const material = new MeshStandardMaterial({
+			// 	color: 0x3498db, // base color (hex or THREE.Color)
+			// })
+
+			// const mesh_subdivided = new Mesh(mesh.geometry, material)
 			// mesh_subdivided.name = mesh.name
-			// // mesh_subdivided.position.x = 100
+			// // mesh_subdivided.position.x = 1
 			// this.scene.add(mesh_subdivided)
 			// mixer_sub = new AnimationMixer(mesh_subdivided)
 			// mixer_sub.clipAction(gltf.animations[0]).play()
