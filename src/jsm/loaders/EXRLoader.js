@@ -1,5 +1,8 @@
-import { DataTextureLoader, DataUtils, FloatType, HalfFloatType, NoColorSpace, LinearFilter, LinearSRGBColorSpace, RedFormat, RGBAFormat } from "three"
+// import { DataTextureLoader, DataUtils, FloatType, HalfFloatType, NoColorSpace, LinearFilter, LinearSRGBColorSpace, RedFormat, RGBAFormat } from "three"
+import { DataTextureLoader } from "@/loaders/DataTextureLoader.js"
 import * as fflate from "../libs/fflate.module.js"
+import { DataUtils } from "@/extras/DataUtils.js"
+import { FloatType, HalfFloatType, LinearFilter, LinearSRGBColorSpace, NoColorSpace, RedFormat, RGBAFormat } from "@/constants.js"
 
 /**
  * OpenEXR loader currently supports uncompressed, ZIP(S), RLE, PIZ and DWA/B compression.

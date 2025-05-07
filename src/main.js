@@ -17,13 +17,18 @@ import { WebGLRenderer } from "./renderers/WebGLRenderer"
 import GUI from "./gui/GUI"
 import { AnimationClip } from "./animation/AnimationClip"
 import { NumberKeyframeTrack } from "./animation/tracks/NumberKeyframeTrack"
-import { NormalAnimationBlendMode } from "./constants"
+import { EquirectangularReflectionMapping, NormalAnimationBlendMode } from "./constants"
 import { aniTime, aniValues } from "./data"
 import { FaceLandmarker, FilesetResolver } from "@mediapipe/tasks-vision"
 import { LoopSubdivision } from "./subdivide/LoopSubdivision"
 import { TextureLoader } from "./loaders/TextureLoader"
 import { MeshPhysicalMaterial } from "./materials/MeshPhysicalMaterial"
 import { MeshStandardMaterial } from "./materials/MeshStandardMaterial"
+import { WireframeGeometry } from "./geometries/WireframeGeometry"
+import { LineSegments } from "./objects/LineSegments"
+import { MeshBasicMaterial } from "./materials/MeshBasicMaterial"
+import { BoxHelper } from "./helpers/BoxHelper"
+import { EXRLoader } from "./jsm/loaders/EXRLoader"
 
 const loadingManager = new LoadingManager()
 loadingManager.onProgress = (url, loaded, total) => {
@@ -84,12 +89,28 @@ class App {
 		this.loadModel()
 		// this.loadGLTFCustomModel()
 		// this.streamingBlendShape()
+		this.createEnvinronment()
 		this.createGUI()
 
 		this.setupEventListeners()
 
 		this.renderer.setAnimationLoop(() => {
 			this.render()
+		})
+	}
+
+	createEnvinronment() {
+		const scene = this.scene
+
+		const exrLoader = new EXRLoader()
+		exrLoader.load("/forest.exr", function (texture) {
+			texture.mapping = EquirectangularReflectionMapping
+
+			// Set the environment map
+			scene.environment = texture
+
+			// Optionally, set the background
+			scene.background = texture
 		})
 	}
 
@@ -116,7 +137,6 @@ class App {
 		this.renderer.setClearColor(0xffffff, 1)
 
 		const room = new RoomEnvironment()
-		// this.scene.environment = pmremGenerator.fromScene(new RoomEnvironment()).texture
 	}
 
 	createControls() {
@@ -278,12 +298,32 @@ class App {
 			console.log("gltf.scene", gltf.scene)
 			console.log("gltf.scene.children", gltf.scene.children[0])
 
-			const material = new MeshStandardMaterial({
-				map: this.texture,
-				roughness: 0.5,
-				metalness: 0.2,
+			const material = new MeshBasicMaterial({
+				color: 0x000000,
+				wireframe: true,
+				// map: this.texture,
+				// roughness: 0.5,
+				// metalness: 0.2,
 			})
-			mesh.material = material
+			// mesh.material = material
+			this.scene.add(mesh)
+
+			const newMesh = mesh.geometry.clone()
+			const wireframe = new WireframeGeometry(mesh.geometry)
+			let line = new LineSegments(wireframe)
+			line.material.depthTest = false
+			line.material.opacity = 0.25
+			line.material.transparent = true
+			// line.position.x = 4
+			this.scene.add(line)
+			this.scene.add(new BoxHelper(line))
+
+			// let line = new LineSegments(wireframe)
+			// line.material.depthTest = false
+			// line.material.opacity = 0.25
+			// line.material.transparent = true
+			// line.position.x = 4
+			// this.scene.add(line)
 
 			// this.mixer = new AnimationMixer(mesh)
 			// const facialAnimation = gltf.animations[0]
@@ -294,17 +334,18 @@ class App {
 			// console.log("animationAction", animationAction)
 			// animationAction.play()
 
-			// const geometry = LoopSubdivision.modify(mesh.geometry, 2)
-			// const material = mesh.material.clone()
-			// material.flatShading = false
-			// const material = new MeshStandardMaterial({
-			// 	color: 0x3498db, // base color (hex or THREE.Color)
-			// })
+			// const geometry = LoopSubdivision.modify(mesh.geometry, 1)
+			// // const material = mesh.material.clone()
+			// // material.flatShading = false
+			// // const material = new MeshStandardMaterial({
+			// // 	color: 0x3498db, // base color (hex or THREE.Color)
+			// // })
 
-			// const mesh_subdivided = new Mesh(mesh.geometry, material)
+			// const mesh_subdivided = new Mesh(geometry, material)
 			// mesh_subdivided.name = mesh.name
-			// // mesh_subdivided.position.x = 1
+			// mesh_subdivided.position.x = 0.2;
 			// this.scene.add(mesh_subdivided)
+
 			// mixer_sub = new AnimationMixer(mesh_subdivided)
 			// mixer_sub.clipAction(gltf.animations[0]).play()
 
@@ -333,7 +374,6 @@ class App {
 			// }
 			//   this.gui.close()
 
-			this.scene.add(mesh)
 			//   this.scene.add(this.model)
 
 			// function printHierarchy(object, depth = 0) {
