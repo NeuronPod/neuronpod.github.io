@@ -35,8 +35,8 @@ loadingManager.onProgress = (url, loaded, total) => {
 	console.log(`Loading file: ${url}.\nLoaded ${loaded} of ${total} files.`)
 }
 
-// SubdivideMesh.glb
-const MODEL_PATH = new URL("/Horse.glb", import.meta.url).href
+// SubdivideMesh.glb /Horse.glb
+const MODEL_PATH = new URL("/BaseMesh_ApplyModified.glb", import.meta.url).href
 
 class App {
 	canvas
@@ -309,15 +309,15 @@ class App {
 			// mesh.material = material
 			this.scene.add(mesh)
 
-			const newMesh = mesh.geometry.clone()
-			const wireframe = new WireframeGeometry(mesh.geometry)
-			let line = new LineSegments(wireframe)
-			line.material.depthTest = false
-			line.material.opacity = 0.25
-			line.material.transparent = true
-			// line.position.x = 4
-			this.scene.add(line)
-			this.scene.add(new BoxHelper(line))
+			// const newMesh = mesh.geometry.clone()
+			// const wireframe = new WireframeGeometry(mesh.geometry)
+			// let line = new LineSegments(wireframe)
+			// line.material.depthTest = false
+			// line.material.opacity = 0.25
+			// line.material.transparent = true
+			// // line.position.x = 4
+			// this.scene.add(line)
+			// this.scene.add(new BoxHelper(line))
 
 			// let line = new LineSegments(wireframe)
 			// line.material.depthTest = false
@@ -335,18 +335,24 @@ class App {
 			// console.log("animationAction", animationAction)
 			// animationAction.play()
 
-			const geometry = LoopSubdivision.modify(mesh.geometry, 1)
-			// const material = mesh.material.clone()
-			// material.flatShading = false
-			// const material = new MeshStandardMaterial({
-			// 	color: 0x3498db, // base color (hex or THREE.Color)
+			// const geometry = LoopSubdivision.modify(mesh.geometry, 2)
+			// // const material = mesh.material.clone()
+			// // material.flatShading = false
+			// // const material = new MeshStandardMaterial({
+			// // 	color: 0x3498db, // base color (hex or THREE.Color)
+			// // })
+			// const material2 = new MeshBasicMaterial({
+			// 	color: 0x000000,
+			// 	wireframe: true,
+			// 	// map: this.texture,
+			// 	// roughness: 0.5,
+			// 	// metalness: 0.2,
 			// })
-
-			const mesh_subdivided = new Mesh(geometry, material)
-			mesh_subdivided.name = mesh.name
+			// const mesh_subdivided = new Mesh(geometry, material2)
+			// mesh_subdivided.name = mesh.name
 			// mesh_subdivided.position.x = 0.2;
-			mesh_subdivided.position.x = 100;
-			this.scene.add(mesh_subdivided)
+			// // mesh_subdivided.position.x = 100
+			// this.scene.add(mesh_subdivided)
 
 			// mixer_sub = new AnimationMixer(mesh_subdivided)
 			// mixer_sub.clipAction(gltf.animations[0]).play()
