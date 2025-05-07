@@ -35,7 +35,8 @@ loadingManager.onProgress = (url, loaded, total) => {
 	console.log(`Loading file: ${url}.\nLoaded ${loaded} of ${total} files.`)
 }
 
-const MODEL_PATH = new URL("/SubdivideMesh.glb", import.meta.url).href
+// SubdivideMesh.glb
+const MODEL_PATH = new URL("/Horse.glb", import.meta.url).href
 
 class App {
 	canvas
@@ -334,17 +335,18 @@ class App {
 			// console.log("animationAction", animationAction)
 			// animationAction.play()
 
-			// const geometry = LoopSubdivision.modify(mesh.geometry, 1)
-			// // const material = mesh.material.clone()
-			// // material.flatShading = false
-			// // const material = new MeshStandardMaterial({
-			// // 	color: 0x3498db, // base color (hex or THREE.Color)
-			// // })
+			const geometry = LoopSubdivision.modify(mesh.geometry, 1)
+			// const material = mesh.material.clone()
+			// material.flatShading = false
+			// const material = new MeshStandardMaterial({
+			// 	color: 0x3498db, // base color (hex or THREE.Color)
+			// })
 
-			// const mesh_subdivided = new Mesh(geometry, material)
-			// mesh_subdivided.name = mesh.name
+			const mesh_subdivided = new Mesh(geometry, material)
+			mesh_subdivided.name = mesh.name
 			// mesh_subdivided.position.x = 0.2;
-			// this.scene.add(mesh_subdivided)
+			mesh_subdivided.position.x = 100;
+			this.scene.add(mesh_subdivided)
 
 			// mixer_sub = new AnimationMixer(mesh_subdivided)
 			// mixer_sub.clipAction(gltf.animations[0]).play()
