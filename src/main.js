@@ -21,8 +21,9 @@ import { NormalAnimationBlendMode } from "./constants"
 import { aniTime, aniValues } from "./data"
 import { FaceLandmarker, FilesetResolver } from "@mediapipe/tasks-vision"
 import { LoopSubdivision } from "./subdivide/LoopSubdivision"
-// import { MeshPhysicalMaterial } from "./materials/MeshPhysicalMaterial"
-// import { MeshStandardMaterial } from "./materials/MeshStandardMaterial"
+import { TextureLoader } from "./loaders/TextureLoader"
+import { MeshPhysicalMaterial } from "./materials/MeshPhysicalMaterial"
+import { MeshStandardMaterial } from "./materials/MeshStandardMaterial"
 
 const loadingManager = new LoadingManager()
 loadingManager.onProgress = (url, loaded, total) => {
@@ -40,6 +41,7 @@ class App {
 	controls
 	clock
 	material
+	texture
 	model
 	composer
 	effectFXAA
@@ -78,6 +80,7 @@ class App {
 		this.createControls()
 		// this.setupCube()
 		this.setupLights()
+		this.loadTexture()
 		this.loadModel()
 		// this.loadGLTFCustomModel()
 		// this.streamingBlendShape()
@@ -249,6 +252,11 @@ class App {
 		// this.gui.close()
 	}
 
+	async loadTexture() {
+		const textureLoader = new TextureLoader()
+		this.texture = textureLoader.load("/uv_grid_opengl.jpg")
+	}
+
 	async loadModel() {
 		// const aniClipKF = new NumberKeyframeTrack("mesh_2.morphTargetInfluences", aniTime, aniValues)
 		// const aniClip = new AnimationClip("Any", 11.18083381652832, [aniClipKF], NormalAnimationBlendMode)
@@ -269,6 +277,13 @@ class App {
 			console.log("mesh", mesh)
 			console.log("gltf.scene", gltf.scene)
 			console.log("gltf.scene.children", gltf.scene.children[0])
+
+			const material = new MeshStandardMaterial({
+				map: this.texture,
+				roughness: 0.5,
+				metalness: 0.2,
+			})
+			mesh.material = material
 
 			// this.mixer = new AnimationMixer(mesh)
 			// const facialAnimation = gltf.animations[0]
@@ -317,6 +332,7 @@ class App {
 			// 	this.morphTargetFolder.add(influences, value, 0, 1, 0.01).name(key.replace("blendShape1.", "")).listen()
 			// }
 			//   this.gui.close()
+
 			this.scene.add(mesh)
 			//   this.scene.add(this.model)
 
