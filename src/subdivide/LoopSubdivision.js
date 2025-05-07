@@ -1,3 +1,6 @@
+import { BufferAttribute } from "@/core/BufferAttribute"
+import { BufferGeometry } from "@/core/BufferGeometry"
+import { Triangle } from "@/math/Triangle"
 import { Vector3 } from "@/math/Vector3"
 
 const POSITION_DECIMALS = 2
@@ -19,7 +22,7 @@ const _position = [new Vector3(), new Vector3(), new Vector3()]
 
 const _vertex = [new Vector3(), new Vector3(), new Vector3()]
 
-const _triangle = new THREE.Triangle()
+const _triangle = new Triangle()
 
 /////////////////////////////////////////////////////////////////////////////////////
 /////   Loop Subdivision Surface
@@ -114,7 +117,7 @@ export class LoopSubdivision {
 		///// Geometries
 		if (!verifyGeometry(geometry)) return geometry
 		const existing = geometry.index !== null ? geometry.toNonIndexed() : geometry.clone()
-		const split = new THREE.BufferGeometry()
+		const split = new BufferGeometry()
 
 		///// Attributes
 		const attributeList = gatherAttributes(existing)
@@ -183,7 +186,7 @@ export class LoopSubdivision {
 			const attribute = existing.getAttribute(attributeName)
 			if (!attribute) return
 			const floatArray = splitAttribute(attribute, attributeName)
-			split.setAttribute(attributeName, new THREE.BufferAttribute(floatArray, attribute.itemSize))
+			split.setAttribute(attributeName, new BufferAttribute(floatArray, attribute.itemSize))
 		})
 
 		///// Morph Attributes
@@ -196,7 +199,7 @@ export class LoopSubdivision {
 			for (let i = 0, l = morphAttribute.length; i < l; i++) {
 				if (morphAttribute[i].count !== vertexCount) continue
 				const floatArray = splitAttribute(morphAttribute[i], attributeName, true)
-				array.push(new THREE.BufferAttribute(floatArray, morphAttribute[i].itemSize))
+				array.push(new BufferAttribute(floatArray, morphAttribute[i].itemSize))
 			}
 			split.morphAttributes[attributeName] = array
 		}
@@ -371,7 +374,7 @@ export class LoopSubdivision {
 		///// Geometries
 		if (!verifyGeometry(geometry)) return geometry
 		const existing = geometry.index !== null ? geometry.toNonIndexed() : geometry.clone()
-		const loop = new THREE.BufferGeometry()
+		const loop = new BufferGeometry()
 
 		///// Attributes
 		const attributeList = gatherAttributes(existing)
@@ -434,7 +437,7 @@ export class LoopSubdivision {
 			index += step * 3
 		}
 
-		return new THREE.BufferAttribute(floatArray, attribute.itemSize)
+		return new BufferAttribute(floatArray, attribute.itemSize)
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////
@@ -453,7 +456,7 @@ export class LoopSubdivision {
 		if (!verifyGeometry(geometry)) return geometry
 		const existing = geometry.index !== null ? geometry.toNonIndexed() : geometry.clone()
 		const flat = LoopSubdivision.flat(existing, params)
-		const loop = new THREE.BufferGeometry()
+		const loop = new BufferGeometry()
 
 		///// Attributes
 		const attributeList = gatherAttributes(existing)
@@ -529,7 +532,7 @@ export class LoopSubdivision {
 			if (existingAttribute === undefined || flattenedAttribute === undefined) return
 
 			const floatArray = subdivideAttribute(attributeName, existingAttribute, flattenedAttribute)
-			loop.setAttribute(attributeName, new THREE.BufferAttribute(floatArray, flattenedAttribute.itemSize))
+			loop.setAttribute(attributeName, new BufferAttribute(floatArray, flattenedAttribute.itemSize))
 		})
 
 		///// Morph Attributes
@@ -545,7 +548,7 @@ export class LoopSubdivision {
 				const flattenedAttribute = LoopSubdivision.flatAttribute(morphAttribute[i], morphAttribute[i].count, params)
 
 				const floatArray = subdivideAttribute(attributeName, existingAttribute, flattenedAttribute)
-				array.push(new THREE.BufferAttribute(floatArray, flattenedAttribute.itemSize))
+				array.push(new BufferAttribute(floatArray, flattenedAttribute.itemSize))
 			}
 			loop.morphAttributes[attributeName] = array
 		}

@@ -20,13 +20,14 @@ import { NumberKeyframeTrack } from "./animation/tracks/NumberKeyframeTrack"
 import { NormalAnimationBlendMode } from "./constants"
 import { aniTime, aniValues } from "./data"
 import { FaceLandmarker, FilesetResolver } from "@mediapipe/tasks-vision"
+import { LoopSubdivision } from "./subdivide/LoopSubdivision"
 
 const loadingManager = new LoadingManager()
 loadingManager.onProgress = (url, loaded, total) => {
 	console.log(`Loading file: ${url}.\nLoaded ${loaded} of ${total} files.`)
 }
 
-const MODEL_PATH = new URL("/facecap_output.gltf", import.meta.url).href
+const MODEL_PATH = new URL("/FemaleBaseMesh.glb", import.meta.url).href
 
 class App {
 	canvas
@@ -93,8 +94,8 @@ class App {
 
 	setupCamera() {
 		this.camera = new PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000)
-		this.camera.position.z = 5
-		// this.camera.position.set(-1, 0.8, 5)
+		// this.camera.position.z = 5
+		this.camera.position.set(0, 0.1, 0.4)
 	}
 
 	createRenderer() {
@@ -116,12 +117,12 @@ class App {
 	createControls() {
 		this.controls = new OrbitControls(this.camera, this.renderer.domElement)
 		this.controls.enableDamping = false
-		this.controls.minDistance = 2.5
-		this.controls.maxDistance = 5
-		this.controls.minAzimuthAngle = -Math.PI / 2
-		this.controls.maxAzimuthAngle = Math.PI / 2
-		this.controls.maxPolarAngle = Math.PI / 1.8
-		this.controls.target.set(0, 0.15, -0.2)
+		// this.controls.minDistance = 2.5
+		// this.controls.maxDistance = 5
+		// this.controls.minAzimuthAngle = -Math.PI / 2
+		// this.controls.maxAzimuthAngle = Math.PI / 2
+		// this.controls.maxPolarAngle = Math.PI / 1.8
+		// this.controls.target.set(0, 0.15, -0.2)
 
 		this.controls.enableDamping = true
 		this.controls.dampingFactor = 0.05
@@ -142,11 +143,11 @@ class App {
 		// const pointLight = new PointLight(0xffffff, 1)
 		// pointLight.position.set(5, 5, 5)
 		// this.scene.add(pointLight)
-		this.lights.main = new DirectionalLight("white", 8)
+		this.lights.main = new DirectionalLight("white", 1.7)
 		this.lights.main.position.set(10, 10, 10)
 		this.scene.add(this.lights.main)
 
-		this.lights.ambient = new AmbientLight("white", 2)
+		this.lights.ambient = new AmbientLight("white", 1.7)
 		this.scene.add(this.lights.ambient)
 	}
 
@@ -234,10 +235,10 @@ class App {
 		// // point2Folder.add(this.lights.point2, 'distance', 0, 2000).name('Distance')
 
 		// // Add camera controls
-		// const cameraFolder = this.gui.addFolder("Camera")
-		// cameraFolder.add(this.camera.position, "x", -5, 5, 0.1).name("Position X")
-		// cameraFolder.add(this.camera.position, "y", -5, 5, 0.1).name("Position Y")
-		// cameraFolder.add(this.camera.position, "z", -5, 5, 0.1).name("Position Z")
+		const cameraFolder = this.gui.addFolder("Camera")
+		cameraFolder.add(this.camera.position, "x", -3.14, 3.14, 0.01).name("Position X")
+		cameraFolder.add(this.camera.position, "y", -3.14, 3.14, 0.01).name("Position Y")
+		cameraFolder.add(this.camera.position, "z", -3.14, 3.14, 0.01).name("Position Z")
 		// cameraFolder.close()
 
 		this.morphTargetFolder = this.gui.addFolder("Morph Targets")
@@ -266,6 +267,7 @@ class App {
 			console.log("mesh", mesh)
 			console.log("gltf.scene", gltf.scene)
 			console.log("gltf.scene.children", gltf.scene.children[0])
+
 			this.mixer = new AnimationMixer(mesh)
 			const facialAnimation = gltf.animations[0]
 			// console.log("facialAnimation", facialAnimation)
@@ -274,6 +276,17 @@ class App {
 			const animationAction = this.mixer.clipAction(aniClip)
 			console.log("animationAction", animationAction)
 			animationAction.play()
+
+			// const geometry = LoopSubdivision.modify(mesh.geometry, 2)
+			// const material = mesh.material.clone()
+			// material.flatShading = false
+			// const mesh_subdivided = new Mesh(geometry, material)
+			// mesh_subdivided.name = mesh.name
+			// // mesh_subdivided.position.x = 100
+			// this.scene.add(mesh_subdivided)
+			// mixer_sub = new AnimationMixer(mesh_subdivided)
+			// mixer_sub.clipAction(gltf.animations[0]).play()
+
 			// const head = mesh.getObjectByName("mesh_2")
 			// const influences = head.morphTargetInfluences
 			//   // Center the model
@@ -322,6 +335,9 @@ class App {
 		loader.load(MODEL_PATH, (gltf) => {
 			console.log("gltf", gltf)
 			const mesh = gltf.scene.children[0]
+			mesh.position.x = 1
+			mesh.position.y = 0
+			mesh.position.z = -5
 			console.log("mesh", mesh)
 			console.log("gltf.scene", gltf.scene)
 			console.log("gltf.scene.children", gltf.scene.children[0])
@@ -357,6 +373,7 @@ class App {
 			// 	this.morphTargetFolder.add(influences, value, 0, 1, 0.01).name(key.replace("blendShape1.", "")).listen()
 			// }
 			//   this.gui.close()
+			mesh.position.set(1, 0, -5)
 			this.scene.add(mesh)
 			//   this.scene.add(this.model)
 
