@@ -24,15 +24,15 @@ const _vertex = [new Vector3(), new Vector3(), new Vector3()]
 
 const _triangle = new Triangle()
 
-/////////////////////////////////////////////////////////////////////////////////////
-/////   Loop Subdivision Surface
-/////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////
+//   Loop Subdivision Surface
+//////////////////////////////////
 
 /** Loop subdivision surface modifier for use with modern three.js BufferGeometry */
 export class LoopSubdivision {
-	/////////////////////////////////////////////////////////////////////////////////////
-	/////   Modify
-	////////////////////
+	//////////////////////////////////
+	//   Modify
+	//////////////////////////////////
 
 	/**
 	 * Applies Loop subdivision modifier to geometry
@@ -55,7 +55,7 @@ export class LoopSubdivision {
 
 		if (typeof params !== "object") params = {}
 
-		///// Parameters
+		// Parameters
 		if (params.split === undefined) params.split = true
 		if (params.uvSmooth === undefined) params.uvSmooth = false
 		if (params.preserveEdges === undefined) params.preserveEdges = false
@@ -65,18 +65,18 @@ export class LoopSubdivision {
 		if (isNaN(params.weight) || !isFinite(params.weight)) params.weight = 1
 		params.weight = Math.max(0, Math.min(1, params.weight))
 
-		///// Geometries
+		// Geometries
 		if (!verifyGeometry(bufferGeometry)) return bufferGeometry
 		let modifiedGeometry = bufferGeometry.clone()
 
-		///// Presplit
+		// Presplit
 		if (params.split) {
 			const splitGeometry = LoopSubdivision.edgeSplit(modifiedGeometry)
 			modifiedGeometry.dispose()
 			modifiedGeometry = splitGeometry
 		}
 
-		///// Apply Subdivision
+		// Apply Subdivision
 		for (let i = 0; i < iterations; i++) {
 			let currentTriangles = modifiedGeometry.attributes.position.count / 3
 			if (currentTriangles < params.maxTriangles) {
@@ -100,13 +100,13 @@ export class LoopSubdivision {
 			}
 		}
 
-		///// Return New Geometry
+		// Return New Geometry
 		return modifiedGeometry
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////
-	/////   Split Hypotenuse
-	////////////////////
+	//////////////////////////////////
+	//   Split Hypotenuse
+	////////
 
 	/**
 	 * Applies one iteration of split subdivision. Splits all triangles at edges shared by coplanar triangles.
@@ -114,12 +114,12 @@ export class LoopSubdivision {
 	 * center of any other shared edges.
 	 */
 	static edgeSplit(geometry) {
-		///// Geometries
+		// Geometries
 		if (!verifyGeometry(geometry)) return geometry
 		const existing = geometry.index !== null ? geometry.toNonIndexed() : geometry.clone()
 		const split = new BufferGeometry()
 
-		///// Attributes
+		// Attributes
 		const attributeList = gatherAttributes(existing)
 		const vertexCount = existing.attributes.position.count
 		const posAttribute = existing.getAttribute("position")
@@ -129,7 +129,7 @@ export class LoopSubdivision {
 		const edgeLength = {}
 		const triangleExist = []
 
-		///// Edges
+		// Edges
 		for (let i = 0; i < vertexCount; i += 3) {
 			// Positions
 			_vector0.fromBufferAttribute(posAttribute, i + 0)
@@ -181,7 +181,7 @@ export class LoopSubdivision {
 			triangleEdgeHashes.push([hashes[0], hashes[2], hashes[4]])
 		}
 
-		///// Build Geometry, Set Attributes
+		// Build Geometry, Set Attributes
 		attributeList.forEach((attributeName) => {
 			const attribute = existing.getAttribute(attributeName)
 			if (!attribute) return
@@ -189,7 +189,7 @@ export class LoopSubdivision {
 			split.setAttribute(attributeName, new BufferAttribute(floatArray, attribute.itemSize))
 		})
 
-		///// Morph Attributes
+		// Morph Attributes
 		const morphAttributes = existing.morphAttributes
 		for (const attributeName in morphAttributes) {
 			const array = []
@@ -365,22 +365,22 @@ export class LoopSubdivision {
 		}
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////
-	/////   Flat
-	////////////////////
+	//////////////////////////////////
+	//   Flat
+	////////
 
 	/** Applies one iteration of Loop (flat) subdivision (1 triangle split into 4 triangles) */
 	static flat(geometry, params = {}) {
-		///// Geometries
+		// Geometries
 		if (!verifyGeometry(geometry)) return geometry
 		const existing = geometry.index !== null ? geometry.toNonIndexed() : geometry.clone()
 		const loop = new BufferGeometry()
 
-		///// Attributes
+		// Attributes
 		const attributeList = gatherAttributes(existing)
 		const vertexCount = existing.attributes.position.count
 
-		///// Build Geometry
+		// Build Geometry
 		attributeList.forEach((attributeName) => {
 			const attribute = existing.getAttribute(attributeName)
 			if (!attribute) return
@@ -388,7 +388,7 @@ export class LoopSubdivision {
 			loop.setAttribute(attributeName, LoopSubdivision.flatAttribute(attribute, vertexCount, params))
 		})
 
-		///// Morph Attributes
+		// Morph Attributes
 		const morphAttributes = existing.morphAttributes
 		for (const attributeName in morphAttributes) {
 			const array = []
@@ -403,7 +403,7 @@ export class LoopSubdivision {
 		}
 		loop.morphTargetsRelative = existing.morphTargetsRelative
 
-		///// Clean Up
+		// Clean Up
 		existing.dispose()
 		return loop
 	}
@@ -440,25 +440,25 @@ export class LoopSubdivision {
 		return new BufferAttribute(floatArray, attribute.itemSize)
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////
-	/////   Smooth
-	////////////////////
+	//////////////////////////////////
+	//   Smooth
+	////////
 
 	/** Applies one iteration of Loop (smooth) subdivision (1 triangle split into 4 triangles) */
 	static smooth(geometry, params = {}) {
 		if (typeof params !== "object") params = {}
 
-		///// Parameters
+		// Parameters
 		if (params.uvSmooth === undefined) params.uvSmooth = false
 		if (params.preserveEdges === undefined) params.preserveEdges = false
 
-		///// Geometries
+		// Geometries
 		if (!verifyGeometry(geometry)) return geometry
 		const existing = geometry.index !== null ? geometry.toNonIndexed() : geometry.clone()
 		const flat = LoopSubdivision.flat(existing, params)
 		const loop = new BufferGeometry()
 
-		///// Attributes
+		// Attributes
 		const attributeList = gatherAttributes(existing)
 		const vertexCount = existing.attributes.position.count
 		const posAttribute = existing.getAttribute("position")
@@ -484,7 +484,7 @@ export class LoopSubdivision {
 			existingEdges[posHash].add(edgeHash)
 		}
 
-		///// Existing Vertex Hashes
+		// Existing Vertex Hashes
 		for (let i = 0; i < vertexCount; i += 3) {
 			const posHash0 = hashFromVector(_vertex[0].fromBufferAttribute(posAttribute, i + 0))
 			const posHash1 = hashFromVector(_vertex[1].fromBufferAttribute(posAttribute, i + 1))
@@ -518,14 +518,14 @@ export class LoopSubdivision {
 			addEdgePoint(posHash2, hash2to0)
 		}
 
-		///// Flat Position to Index Map
+		// Flat Position to Index Map
 		for (let i = 0; i < flat.attributes.position.count; i++) {
 			const posHash = hashFromVector(_temp.fromBufferAttribute(flatPosition, i))
 			if (!hashToIndex[posHash]) hashToIndex[posHash] = []
 			hashToIndex[posHash].push(i)
 		}
 
-		///// Build Geometry, Set Attributes
+		// Build Geometry, Set Attributes
 		attributeList.forEach((attributeName) => {
 			const existingAttribute = existing.getAttribute(attributeName)
 			const flattenedAttribute = flat.getAttribute(attributeName)
@@ -535,7 +535,7 @@ export class LoopSubdivision {
 			loop.setAttribute(attributeName, new BufferAttribute(floatArray, flattenedAttribute.itemSize))
 		})
 
-		///// Morph Attributes
+		// Morph Attributes
 		const morphAttributes = existing.morphAttributes
 		for (const attributeName in morphAttributes) {
 			const array = []
@@ -554,12 +554,12 @@ export class LoopSubdivision {
 		}
 		loop.morphTargetsRelative = existing.morphTargetsRelative
 
-		///// Clean Up
+		// Clean Up
 		flat.dispose()
 		existing.dispose()
 		return loop
 
-		//////////
+		////
 
 		// Loop Subdivide Function
 		function subdivideAttribute(attributeName, existingAttribute, flattenedAttribute) {
@@ -602,7 +602,7 @@ export class LoopSubdivision {
 						const neighbors = existingNeighbors[positionHash]
 						const opposites = flatOpposites[positionHash]
 
-						///// Adjust Source Vertex
+						// Adjust Source Vertex
 						if (neighbors) {
 							// Check Edges have even Opposite Points
 							if (params.preserveEdges) {
@@ -617,22 +617,22 @@ export class LoopSubdivision {
 							// Number of Neighbors
 							const k = Object.keys(neighbors).length
 
-							///// Loop's Formula
+							// Loop's Formula
 							const beta = (1 / k) * (5 / 8 - Math.pow(3 / 8 + (1 / 4) * Math.cos((2 * Math.PI) / k), 2))
 
-							///// Warren's Formula
+							// Warren's Formula
 							// const beta = (k > 3) ? 3 / (8 * k) : ((k === 3) ? 3 / 16 : 0);
 
-							///// Stevinz' Formula
+							// Stevinz' Formula
 							// const beta = 0.5 / k;
 
-							///// Corners
+							// Corners
 							const heavy = 1 / k / k
 
-							///// Interpolate Beta -> Heavy
+							// Interpolate Beta -> Heavy
 							const weight = lerp(heavy, beta, params.weight)
 
-							///// Average with Neighbors
+							// Average with Neighbors
 							const startWeight = 1.0 - weight * k
 							_vertex[v].multiplyScalar(startWeight)
 
@@ -649,7 +649,7 @@ export class LoopSubdivision {
 								_vertex[v].add(_average)
 							}
 
-							///// Newly Added Edge Vertex
+							// Newly Added Edge Vertex
 						} else if (opposites && opposites.length === 2) {
 							const k = opposites.length
 							const beta = 0.125 /* 1/8 */
@@ -675,9 +675,9 @@ export class LoopSubdivision {
 	}
 }
 
-/////////////////////////////////////////////////////////////////////////////////////
-/////   Local Functions, Hash
-/////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////
+//   Local Functions, Hash
+//////////////////////////////////
 
 const _positionShift = Math.pow(10, POSITION_DECIMALS)
 
@@ -706,9 +706,9 @@ function round(x) {
 	return (x + (x > 0 ? 0.5 : -0.5)) << 0
 }
 
-/////////////////////////////////////////////////////////////////////////////////////
-/////   Local Functions, Geometry
-/////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////
+//   Local Functions, Geometry
+//////////////////////////////////
 
 function calcNormal(target, vec1, vec2, vec3) {
 	_temp.subVectors(vec1, vec2)
